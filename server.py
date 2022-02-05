@@ -79,7 +79,7 @@ def handle_get_status(request: RequestHandler):
 	request.end_headers()
 	request.wfile.write(data)
 
-def handle_get_file(request: RequestHandler):
+def handle_get_file(request: RequestHandler, base_path='gui/'):
 	path = request.path
 	if(path == '/'):
 		path = '/index.html'
@@ -88,7 +88,7 @@ def handle_get_file(request: RequestHandler):
 
 	path = path[1:] #Remove the leading /
 
-	fp = open(path, 'r')
+	fp = open(os.path.join(base_path, path), 'r')
 	data = fp.read().encode('utf-8')
 	fp.close()
 	request.send_response(200)	
