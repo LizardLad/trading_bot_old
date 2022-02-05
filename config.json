@@ -1,0 +1,17 @@
+{
+	"model_filepath": "./model",
+	"train_split": "0.7",
+	"batch_size": 80,
+	"quote_time_delta": 5,
+	"feature_length_minutes": 60,
+	"samples": 8,
+	"stride_length_minutes": 15,
+	"lookahead_minutes": 46,
+	"gain_threshold": 1.5,
+	"loss_threshold": 0.0,
+	"epochs": 25,
+	"learning_rate": 7e-4,
+	"learning_rate_decay": 5e-6,
+	"class_count": 3,
+	"min_class_representation_percentage": 0.10
+}
