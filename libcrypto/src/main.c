@@ -30,7 +30,6 @@ int extract_quotes(char *filename, struct asset_t **assets_ret) {
 			filter_data(&(assets[i]));
 		if(assets[i].filtered_sample_count == 0) //If there are no filtered samples then don't use it
 			assets[i].in_use = false;
-		if(assets[i].in_use == true) printf("%f\n", assets[i].filtered_ask_prices[assets[i].filtered_sample_count-1]);
 	}
 	*assets_ret = assets;
 	return 0;
