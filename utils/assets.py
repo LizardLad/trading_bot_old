@@ -37,5 +37,5 @@ for idx, asset in enumerate(asset_list):
 	comma = ','
 	if(idx == len(asset_list)-1):
 		comma = ''
-	print('\t{asset_id}: Asset(\'{asset_code}\', \'{asset_name}\'){comma}'.format(asset_id=asset_id, asset_code=asset_code, asset_name=asset['name'], comma=comma))
+	print('\t{asset_id}: Asset({asset_id}, \'{asset_code}\', \'{asset_name}\'){comma}'.format(asset_id=asset_id, asset_code=asset_code, asset_name=asset['name'], comma=comma))
 print('}')
