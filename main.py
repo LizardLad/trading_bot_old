@@ -1,18 +1,14 @@
 import os
 import sys
-import zlib
 import time
-import json
-import math
-import struct
+import asset
+import config
 import logging
 import argparse
-import training
 import multiprocessing
 import tensorflow as tf
 
-from training import CryptoModel, train_main, eval_main
-from asset import ASSET_ID_TO_IDX_LUT, ASSET_NAMES, Asset, asset_id_in_use
+from training import train_main, eval_main
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s.%(msecs)03d [%(levelname)-8s] [%(filename)s:%(lineno)d] %(message)s', datefmt='%Y-%m-%d:%H:%M:%S')
 
@@ -26,16 +22,7 @@ def main():
 	parser.add_argument('-o', '--output', help='Model filepath for output. If not set uses model filepath in config.json')
 	args = parser.parse_args()
 
-	fp = open('config.json', 'r')
-	config = json.load(fp)
-	fp.close()
-
 	multiprocessing.set_start_method('spawn')
-
-	#Create list of all used assets
-	assets = [Asset(asset_id) for asset_id in ASSET_ID_TO_IDX_LUT if asset_id > -1]
-	for i, asset in enumerate(assets):
-		asset.set_name(ASSET_NAMES[i])
 
 	if(args.mode):
 		#There are several modes this program can run in
@@ -47,10 +34,10 @@ def main():
 		program_mode = str(args.mode).lower()
 		if(program_mode == 'train'):
 			logging.info('Training model from files')
-			train_main(args, config, assets)
+			train_main(args)
 		elif(program_mode == 'eval' or program_mode == 'evaluate'):
 			logging.info('Evaluating model from test files')
-			eval_main(args, config, assets)
+			eval_main(args)
 		elif(program_mode == 'sim_files' or program_mode == 'simulate_files'):
 			logging.warning('Simulate files is not fully implemented yet')
 			time.sleep(1)

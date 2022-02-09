@@ -1,6 +1,8 @@
 import os
+import sys
 import math
 import time
+import config
 import logging
 import functools
 import numpy as np
@@ -10,11 +12,12 @@ from tf_utils import tf_init
 from interface import FileReader
 from dataset import CryptoDataset, gen_map
 
-def train_main(args, config, assets):
+from asset import assets
+
+def train_main(args):
 	#This trains from files
 	#Read from files
 	tf_init()
-
 	if(args.dir and args.input):
 		logging.error('Input file and input dir set. Only one at a time is supported!')
 		sys.exit(1)
@@ -36,27 +39,22 @@ def train_main(args, config, assets):
 		logging.error('Training mode provided without input to train on')
 		sys.exit(1)
 
-	desired_train_split = float(config.get('train_split', 0.7))
-	batch_size = int(config.get('batch_size', 2**6))
-	quote_time_delta = int(config.get('quote_time_delta', 5))
-	max_repeated_samples = int(config.get('max_repeated_samples', 10))
+	desired_train_split = float(config.cfg.get('train_split', 0.7))
+	batch_size = int(config.cfg.get('batch_size', 2**6))
+	quote_time_delta = int(config.cfg.get('quote_time_delta', 5))
 	samples_per_minute = int(math.floor(60/quote_time_delta))
-	feature_length = int(config.get('feature_length_minutes', 75)) * samples_per_minute
-	samples = int(config.get('samples', 8))
-	stride_length = int(config.get('stride_length_minutes', 2)) * samples_per_minute
-	lookahead = int(config.get('lookahead_minutes', 45)) * samples_per_minute
-	gain_threshold = float(config.get('gain_threshold', 2.5)) / 100.0 #Make %
-	loss_threshold = float(config.get('loss_threshold', 0.0)) / 100.0 #Make %
-	max_epochs = int(config.get('epochs', 6))
-	lr = float(config.get('learning_rate', 1e-3))
-	lr_decay = float(config.get('learning_rate_decay', 1e-6))
-	class_count = int(config.get('class_count', 3))
-	model_filepath = str(config.get('model_filepath', './model'))
-	min_rep_percent = float(config.get('min_class_representation_percentage', 0.5))
-
-	for asset in assets:
-		asset.max_repeated_samples = max_repeated_samples
-		asset.quote_time_delta = quote_time_delta
+	feature_length = int(config.cfg.get('feature_length_minutes', 75)) * samples_per_minute
+	samples = int(config.cfg.get('samples', 8))
+	stride_length = int(config.cfg.get('stride_length_minutes', 2)) * samples_per_minute
+	lookahead = int(config.cfg.get('lookahead_minutes', 45)) * samples_per_minute
+	gain_threshold = float(config.cfg.get('gain_threshold', 2.5)) / 100.0 #Make %
+	loss_threshold = float(config.cfg.get('loss_threshold', 0.0)) / 100.0 #Make %
+	max_epochs = int(config.cfg.get('epochs', 6))
+	lr = float(config.cfg.get('learning_rate', 1e-3))
+	lr_decay = float(config.cfg.get('learning_rate_decay', 1e-6))
+	class_count = int(config.cfg.get('class_count', 3))
+	model_filepath = str(config.cfg.get('model_filepath', './model'))
+	min_rep_percent = float(config.cfg.get('min_class_representation_percentage', 0.5))
 	
 	if(args.new_model):
 		logging.info('Creating new model')
@@ -66,9 +64,9 @@ def train_main(args, config, assets):
 		model = tf.keras.models.load_model(model_filepath)
 	model_interface = CryptoModel(model)
 	
-	file_reader = FileReader(os.environ.get('LIBCRYPTO_PATH', '../libcrypto.so'))
+	file_reader = FileReader(os.environ.get('LIBCRYPTO_PATH', 'libcrypto/libcrypto.so'))
 	for idx, filepath in enumerate(files):
-		if(idx):
+		if(idx): #If it isn't the first file then clear some memory
 			tf.keras.backend.clear_session()
 			if(args.output):
 				model = tf.keras.models.load_model(args.output)
@@ -83,13 +81,25 @@ def train_main(args, config, assets):
 		file_reader.read_from_file(filepath)
 		logging.debug('Reading file took {}s'.format(time.time() - start_time))
 		start_time = time.time()
-		for i, asset in enumerate(assets):
-			asset.filtered_ask_prices = file_reader.get_filtered_ask_prices_from_asset_id(asset.asset_id)
-			asset_filtered_timestamps = file_reader.get_filtered_timestamps(asset.asset_id)
+		for asset in assets.values():
+			ask_price_samples = file_reader.get_samples_by_asset_id(asset.asset_id, filtered=True, side='ask')
+			mid_price_samples = file_reader.get_samples_by_asset_id(asset.asset_id, filtered=True, side='mid')
+			bid_price_samples = file_reader.get_samples_by_asset_id(asset.asset_id, filtered=True, side='bid')
+			timestamps = file_reader.get_timestamps_by_asset_id(asset.asset_id, filtered=True)
+			asset.add_samples_from_file(ask_price_samples, mid_price_samples, bid_price_samples, timestamps, filtered=True)
 		logging.debug('Data filtering took: {}s'.format(time.time()-start_time))
 		file_reader.free()
+		logging.debug('File time span: {}s'.format(timestamps[-1] - timestamps[1]))
+		
+		model= tf.keras.models.load_model(model_filepath)
+		model_interface = CryptoModel(model)
+		
+		price_samples = []
+		for asset in assets.values():
+			ask_price_samples = asset.get_samples(filtered=True, side='ask')
+			if(len(ask_price_samples) > 0):
+				price_samples.extend(ask_price_samples)
 
-		price_samples = [asset.filtered_ask_prices for asset in assets if len(asset.filtered_ask_prices) > 0]
 		model_interface.train_eval_init(batch_size, feature_length, samples, stride_length, lookahead, gain_threshold, loss_threshold, training=True)
 		model_interface.train(price_samples, desired_train_split, lr, lr_decay, max_epochs, min_rep_percent=min_rep_percent, class_expansion=False)
 
@@ -101,9 +111,8 @@ def train_main(args, config, assets):
 	logging.info('Training complete')
 	return 0
 
-def eval_main(args, config, assets):
+def eval_main(args):
 	tf_init()
-
 	if(args.dir and args.input):
 		logging.error('Input file and input dir set. Only one at a time is supported!')
 		sys.exit(1)
@@ -127,37 +136,45 @@ def eval_main(args, config, assets):
 		logging.error('Evaluation mode provided without input to evalutate with')
 		sys.exit(1)
 
-	batch_size = int(config.get('batch_size', 2**6))
-	quote_time_delta = int(config.get('quote_time_delta', 5))
-	max_repeated_samples = int(config.get('max_repeated_samples', 10))
+	batch_size = int(config.cfg.get('batch_size', 2**6))
+	quote_time_delta = int(config.cfg.get('quote_time_delta', 5))
 	samples_per_minute = int(math.floor(60/quote_time_delta))
-	feature_length = int(config.get('feature_length_minutes', 75)) * samples_per_minute
-	samples = int(config.get('samples', 8))
-	stride_length = int(config.get('stride_length_minutes', 2)) * samples_per_minute
-	lookahead = int(config.get('lookahead_minutes', 45)) * samples_per_minute
-	gain_threshold = float(config.get('gain_threshold', 2.5)) / 100 #In %
-	loss_threshold = float(config.get('loss_threshold', 0.0)) / 100#In %
-	model_filepath = str(config.get('model_filepath', './model'))
+	feature_length = int(config.cfg.get('feature_length_minutes', 75)) * samples_per_minute
+	samples = int(config.cfg.get('samples', 8))
+	stride_length = int(config.cfg.get('stride_length_minutes', 2)) * samples_per_minute
+	lookahead = int(config.cfg.get('lookahead_minutes', 45)) * samples_per_minute
+	gain_threshold = float(config.cfg.get('gain_threshold', 2.5)) / 100 #In %
+	loss_threshold = float(config.cfg.get('loss_threshold', 0.0)) / 100#In %
+	model_filepath = str(config.cfg.get('model_filepath', './model'))
 
-	for asset in assets:
-		asset.max_repeated_samples = max_repeated_samples
-		asset.quote_time_delta = quote_time_delta
-
-	file_reader = FileReader(os.environ.get('LIBCRYPTO_PATH', '../libcrypto.so'))
+	file_reader = FileReader(os.environ.get('LIBCRYPTO_PATH', 'libcrypto/libcrypto.so'))
 
 	y_true = []
 	y_pred = []
-	for idx, filepath in enumerate(files):
+	for filepath in enumerate(files):
+		#Read one files contents into asset instances
 		logging.info('Evaluating model with file: {}'.format(filepath))
 		file_reader.read_from_file(filepath)
-		for asset in assets:
-			asset.filtered_ask_prices = file_reader.get_filtered_ask_prices_from_asset_id(asset.asset_id)
-			asset.filtered_timestamps = file_reader.get_filtered_timestamps(asset.asset_id)
-		logging.debug('File time span: {}s'.format(asset.filtered_timestamps[-1] - asset.filtered_timestamps[1]))
+		for asset in assets.values(): #TODO only grab assets that have information in the files
+			ask_price_samples = file_reader.get_samples_by_asset_id(asset.asset_id, filtered=True, side='ask')
+			mid_price_samples = file_reader.get_samples_by_asset_id(asset.asset_id, filtered=True, side='mid')
+			bid_price_samples = file_reader.get_samples_by_asset_id(asset.asset_id, filtered=True, side='bid')
+			timestamps = file_reader.get_timestamps_by_asset_id(asset.asset_id, filtered=True)
+			if(not (len(ask_price_samples) == 0 or len(mid_price_samples) == 0 or len(bid_price_samples) == 0 or len(timestamps) == 0)): #Must have something in them
+				asset.add_samples_from_file(ask_price_samples, mid_price_samples, bid_price_samples, timestamps, filtered=True)
+
 		file_reader.free()
+		logging.debug('File time span: {}s'.format(timestamps[-1] - timestamps[1]))
+		
 		model= tf.keras.models.load_model(model_filepath)
 		model_interface = CryptoModel(model)
-		price_samples = [asset.filtered_ask_prices for asset in assets if len(asset.filtered_ask_prices) > 0]
+		
+		price_samples = []
+		for asset in assets.values():
+			ask_price_samples = asset.get_samples(filtered=True, side='ask')
+			if(len(ask_price_samples) > 0):
+				price_samples.extend(ask_price_samples)
+		
 		model_interface.train_eval_init(batch_size, feature_length, samples, stride_length, lookahead, gain_threshold, loss_threshold, training=False)
 		true_y, pred_y = model_interface.eval(price_samples)
 		y_true.extend(true_y)

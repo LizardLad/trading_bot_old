@@ -46,15 +46,28 @@ class Filter():
 				-0.0010133009929300402,	0.00027851871599426437,	-0.000989716336566947, 
 				0.00124974402779808,	-0.0015336948959665682,	0.002594349160607653,
 				0.003548249252672876]
-		self.delay = 5 * len(self.filter_taps) / 2
 
-	def filter(self, sample):
-		if(len(sample) < len(self.filter_taps)):
-			raise ValueError('Insufficient sample length for filtering')
-		elif(len(sample) > len(self.filter_taps)):
-			raise ValueError('Sample provided is longer than the filter length')
-		else:
-			pass
-        
-		value = sum(map(lambda x,y:x*y, self.filter_taps, sample))
-		return value
+	def filter(self, samples):
+		if(len(samples) != len(self.filter_taps)):
+			raise ValueError('Samples length not equal to filter_taps length')
+
+		ask_price_samples = [sample['ask_price'] for sample in samples if 'ask_price' in sample]
+		mid_price_samples = [sample['mid_price'] for sample in samples if 'mid_price' in sample]
+		bid_price_samples = [sample['bid_price'] for sample in samples if 'bid_price' in sample]
+		if(len(ask_price_samples) != len(samples) or len(mid_price_samples) != len(samples) or len(bid_price_samples) != len(samples)):
+			raise ValueError('Not every sample as all three fields (ask_price, mid_price, bid_price)')
+
+		ask_price = sum(map(lambda x,y:x*y, self.filter_taps, ask_price_samples))
+		mid_price = sum(map(lambda x,y:x*y, self.filter_taps, mid_price_samples))
+		bid_price = sum(map(lambda x,y:x*y, self.filter_taps, bid_price_samples))
+		if('timestamp' not in samples[-1]):
+			raise ValueError('Key timestamp does not exist in latest sample')
+		timestamp = samples[-1]['timestamp']
+
+		filtered_sample = {
+			'ask_price' : ask_price, 
+			'mid_price' : mid_price,
+			'bid_price' : bid_price,
+			'timestamp' : timestamp
+		}
+		return filtered_sample

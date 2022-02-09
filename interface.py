@@ -35,16 +35,35 @@ class FileReader():
 		self.assets_p = assets_p
 		return result
 
-	def get_filtered_ask_prices_from_asset_id(self, asset_id):
-		sample_count = self.get_sample_count(self.assets_p, ctypes.c_uint(asset_id), ctypes.c_bool(True))
+	def get_samples_by_asset_id(self, asset_id, filtered=False, side='ask'):
+		sample_count = self.get_sample_count(self.assets_p, ctypes.c_uint(asset_id), ctypes.c_bool(filtered))
 		d_buffer = (ctypes.c_double * sample_count)()
-		self.get_asset_samples(self.assets_p, ctypes.c_uint(asset_id), None, None, None, ctypes.byref(d_buffer), None, None, sample_count)
+		
+		if(side == 'ask' and filtered):
+			ret = self.get_asset_samples(self.assets_p, ctypes.c_uint(asset_id), ctypes.byref(d_buffer), None, None, None, None, None, sample_count)	
+		elif(side == 'mid' and filtered):
+			ret = self.get_asset_samples(self.assets_p, ctypes.c_uint(asset_id), None, ctypes.byref(d_buffer), None, None, None, None, sample_count)
+		elif(side == 'bid' and filtered):
+			ret = self.get_asset_samples(self.assets_p, ctypes.c_uint(asset_id), None, None, ctypes.byref(d_buffer), None, None, None, sample_count)
+		elif(side == 'ask' and not filtered):
+			ret = self.get_asset_samples(self.assets_p, ctypes.c_uint(asset_id), None, None, None, ctypes.byref(d_buffer), None, None, sample_count)
+		elif(side == 'mid' and not filtered):
+			ret = self.get_asset_samples(self.assets_p, ctypes.c_uint(asset_id), None, None, None, None, ctypes.byref(d_buffer), None, sample_count)
+		elif(side == 'bid' and not filtered):
+			ret = self.get_asset_samples(self.assets_p, ctypes.c_uint(asset_id), None, None, None, None, None, ctypes.byref(d_buffer), sample_count)
+		else:
+			raise ValueError('Invalid argument passed for side kwarg')
+
+		if(ret == -2):
+			return []
+		elif(ret):
+			raise ValueError('C side get_asset_samples returned {}'.format(ret))
 		return list(d_buffer)
 
-	def get_filtered_timestamps(self, asset_id):
+	def get_timestamps_by_asset_id(self, asset_id, filtered=False):
 		sample_count = self.get_sample_count(self.assets_p, ctypes.c_uint(asset_id), ctypes.c_bool(True))
 		i_buffer = (ctypes.c_longlong * sample_count)()
-		sample_count = self.get_timestamps(assets_p, ctypes.c_uint(asset_id), ctypes.c_bool(True), ctypes.byref(i_buffer), sample_count)
+		sample_count = self.get_timestamps(assets_p, ctypes.c_uint(asset_id), ctypes.c_bool(filtered), ctypes.byref(i_buffer), sample_count)
 		return list(i_buffer)
 
 	def free(self):
