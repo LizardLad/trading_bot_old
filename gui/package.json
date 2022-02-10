@@ -1,25 +1,21 @@
 {
-  "dependencies": {
-    "@types/jest": "^27.4.0",
-    "@types/node": "^17.0.16",
-    "@types/react": "^17.0.39",
-    "@types/react-dom": "^17.0.11",
-    "ts-loader": "^9.2.6",
-    "typescript": "^4.5.5"
-  },
   "name": "stronkai-gui",
   "version": "1.0.0",
-  "main": "main.js",
+  "main": "./dist/main.tsx",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc --build ./*.tsx -o app.js",
+    "build": "parcel build",
     "start": "python /home/oliver/Development/ML/trading_bot/server.py"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "webpack": "^5.68.0",
-    "webpack-cli": "^4.9.2"
+    "@types/jest": "^27.4.0",
+    "@types/node": "^17.0.16",
+    "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.11",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.5"
   }
 }

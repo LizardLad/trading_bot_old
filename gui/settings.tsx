@@ -1,5 +1,5 @@
 export {Settings};
-import React = require("react");
+import React from 'react';
 
 function Settings() {
 	return (

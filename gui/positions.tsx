@@ -1,5 +1,4 @@
 export {AssetPosition, AssetTrade};
-
 import React from 'react';
 
 type AssetPositionProps = {

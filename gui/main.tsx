@@ -10,8 +10,6 @@ import ReactDOM from 'react-dom';
 function main_init() {
 	console.log('Hello from js');
 	console.log('Create tabs');
-	
-	document.getElementById('default_tab')!.click();
 
 	console.log('Do POST');
 	const request = new XMLHttpRequest();

@@ -1,5 +1,5 @@
 export {Trades};
-import React = require("react");
+import React from 'react';
 
 function Trades() {
 	return (

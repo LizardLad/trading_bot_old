@@ -1,5 +1,5 @@
 export {ModelPerformance};
-import React = require("react");
+import React from 'react';
 
 function ModelPerformance() {
 	return (

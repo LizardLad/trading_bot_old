@@ -1,5 +1,5 @@
 export {TabBar};
-import React = require("react");
+import React from 'react';
 
 function fix_selected_classes(e: React.MouseEvent) {
 	var tab_links = document.getElementsByClassName('tab_link'); 
