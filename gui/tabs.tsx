@@ -10,7 +10,7 @@ function fix_selected_classes(e: React.MouseEvent) {
 	target.className += ' active';
 }
 
-function TabBar(set_selected_tab: React.Dispatch<React.SetStateAction<string>>) {
+function TabBar({set_selected_tab}: {set_selected_tab: React.Dispatch<React.SetStateAction<string>>;}) {
 	return (
 		<div className='tab_links'>
 			<button className='tab_link' id='default_tab' onClick={(e: React.MouseEvent) => {fix_selected_classes(e);set_selected_tab('trades');}}>Trades</button>

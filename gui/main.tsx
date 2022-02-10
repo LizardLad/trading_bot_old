@@ -1,4 +1,4 @@
-import { Asset } from './positions';
+import { AssetPosition, AssetTrade } from './positions';
 import {TabBar} from './tabs';
 import {Trades} from './trades';
 import {PriceGraphs} from './price_graphs';
@@ -29,9 +29,9 @@ function main_init() {
 	}
 
 	//Create ETH asset
-	var eth = new Asset('ETH', 'Ethereum');
-	eth.generate_asset_position();
-	eth.generate_upcoming_trade();
+	//var eth = new Asset('ETH', 'Ethereum');
+	//eth.generate_asset_position();
+	//eth.generate_upcoming_trade();
 
 }
 
@@ -51,9 +51,13 @@ const TABS: TABS_INTERFACE = {
 export default function App() {
 	const [selected_tab, set_selected_tab] = React.useState<string>('trades');
 
+	const TabBar_properties = {
+		set_selected_tab: set_selected_tab
+	}
+
 	return (
 		<div>
-			<TabBar set_selected_tab={set_selected_tab} />
+			<TabBar {...TabBar_properties} />
 			{TABS[selected_tab]}
 		</div>
 	);
