@@ -61,6 +61,6 @@ export default function App() {
 
 ReactDOM.render(
 	<App />,
-	document.getElementById('root')
+	document.getElementById('centre_tabs')
 );
   
