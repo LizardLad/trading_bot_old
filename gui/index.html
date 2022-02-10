@@ -1,56 +1,12 @@
 <!DOCTYPE html>
-<html lang='en'>
-	<head>
-		<meta charset='UTF-8'>
-		<meta name='viewport' content='width=device-width, initial-scale=1.0'>
-		<link rel='stylesheet' href='styles/base.css'>
-		<link rel='stylesheet' href='styles/main.css'>
-		<link rel='stylesheet' href='styles/icons.css'>
-		<title>StronkAI Dashboard</title>
-		<!--<script type="application/javascript" src="https://unpkg.com/react@17.0.2/umd/react.development.js"></script>
-		<script type="application/javascript" src="https://unpkg.com/react-dom@17.0.2/umd/react-dom.development.js"></script>
-		<script type="application/javascript" src="https://unpkg.com/@babel/standalone/babel.min.js"></script>-->
-		<script type='application/javascript' data-type='module' src='/dist/main.js'></script>
-		<script type='application/javascript' data-type='module' src='/dist/tabs.js'></script>
-		<script type='application/javascript' data-type='module' src='/dist/trades.js'></script>
-		<script type='application/javascript' data-type='module' src='/dist/price_graphs.js'></script>
-		<script type='application/javascript' data-type='module' src='/dist/model_performance.js'></script>
-		<script type='application/javascript' data-type='module' src='/dist/settings.js'></script>
-		
-	</head>
-	<body>
-	<div class='main_columns'>
-		<div class='column side_column' id='left_sidebar'>
-			<h2>StronkAI</h2>
-			<hr class='title_separator'>
-			<div class='position_container' id='position_container'>
-				<div class='position_symbol position_column'>
-					<em class='icon icon-ETH'></em>
-				</div>
-				<div class='position_left_col position_column'>
-					<div class='position_asset_name position_element'>ETH</div>
-					<div class='position_asset_amount position_element'>2.002</div>
-				</div>
-				<div class='position_right_col position_column'>
-					<div class='position_aud_value position_element'>10,000.00</div>
-					<div class='position_percentage position_element'>+10%</div>
-				</div>
-			</div>
-
-			Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.
-		</div>
-		<div class='column centre_column' id='centre_column' style='border-left-style: solid; border-width: 0.15em;'>
-			<div id='centre_tabs'>
-			</div>
-		</div>
-		<div class='column side_column' id='right_sidebar' style='border-left-style: solid; border-width: 0.15em;'>
-			<h2>Upcoming trades</h2>
-			<hr class='title_separator'>
-			<div id='upcoming_trades_container'>
-			</div>
-			Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.
-		</div>
-	</div>
-	<script type='application/javascript'>document.addEventListener("DOMContentLoaded", function(){main_init();});</script>
-	</body>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>StronkAI Dashboard</title>
+    </head>
+    <body>
+        <div id="root" class="main_columns"></div>
+        <script type="module" src="./src/index.tsx"></script>
+    </body>
 </html>
