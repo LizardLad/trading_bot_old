@@ -17,6 +17,8 @@ class RequestHandler(RequestHandlerParent):
 			#Send to path handler
 			cb_idx = self.__class__._shared_borg_state.get('valid_get_paths', []).index(self.path)
 			self.__class__._shared_borg_state.get('get_callbacks', [])[cb_idx](self) #Pass the RequestHandler to the path handler
+		elif(os.path.splitext(self.path)[1][1:] == 'jsx'):
+			handle_get_file(self)
 		else:
 			self.send_response(418)
 			self.send_header('Content-type', 'text/text')
@@ -86,9 +88,19 @@ def handle_get_file(request: RequestHandler, base_path='gui/'):
 	else:
 		pass
 
-	path = path[1:] #Remove the leading /
+	path = os.path.join(base_path, path[1:]) #Remove the leading /
 
-	fp = open(os.path.join(base_path, path), 'r')
+	if(os.path.splitext(path)[1][1:] == 'jsx'):
+		#Check it exists first
+		if(not os.path.isfile(path)):
+			print('Does not exist {}'.format(path))
+			request.send_response(418)
+			request.send_header('Content-type', 'text/text')
+			request.end_headers()
+			request.wfile.write(b'Refusing to brew coffee because I am, permanently, a teapot. Serving tea now...')
+			return
+
+	fp = open(path, 'r')
 	data = fp.read().encode('utf-8')
 	fp.close()
 	request.send_response(200)	
@@ -100,6 +112,10 @@ def handle_get_file(request: RequestHandler, base_path='gui/'):
 		mime = 'text/css'
 	elif(ext == 'js'):
 		mime = 'application/javascript'
+	elif(ext == 'jsx'):
+		mime = 'text/babel'
+		mime = 'application/javascript'
+		mime = 'text/jsx'
 	else:
 		#Unknown ext
 		print(ext)

@@ -1,3 +1,5 @@
 libcrypto/build/*
 .vscode*
 __pycache__/
+gui/node_modules
+gui/package-lock.json
