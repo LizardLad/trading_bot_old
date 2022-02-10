@@ -9,50 +9,13 @@ function fix_selected_classes(e: React.MouseEvent) {
     target.className += ' active';
 }
 
-export default function TabBar({
-    set_selected_tab,
-}: {
-    set_selected_tab: React.Dispatch<React.SetStateAction<string>>;
-}) {
+export default function TabBar({set_selected_tab}: {set_selected_tab: React.Dispatch<React.SetStateAction<string>>;}) {
     return (
         <div className="tab_links">
-            <button
-                className="tab_link"
-                id="default_tab"
-                onClick={(e: React.MouseEvent) => {
-                    fix_selected_classes(e);
-                    set_selected_tab('trades');
-                }}
-            >
-                Trades
-            </button>
-            <button
-                className="tab_link"
-                onClick={(e: React.MouseEvent) => {
-                    fix_selected_classes(e);
-                    set_selected_tab('price_graphs');
-                }}
-            >
-                Price Graphs
-            </button>
-            <button
-                className="tab_link"
-                onClick={(e: React.MouseEvent) => {
-                    fix_selected_classes(e);
-                    set_selected_tab('model_performance');
-                }}
-            >
-                Model Performace
-            </button>
-            <button
-                className="tab_link"
-                onClick={(e: React.MouseEvent) => {
-                    fix_selected_classes(e);
-                    set_selected_tab('settings');
-                }}
-            >
-                Settings
-            </button>
+            <button className="tab_link" id="default_tab" onClick={(e: React.MouseEvent) => {fix_selected_classes(e);set_selected_tab('trades');}}>Trades</button>
+            <button className="tab_link" onClick={(e: React.MouseEvent) => {fix_selected_classes(e);set_selected_tab('price_graphs');}}>Price Graphs</button>
+            <button className="tab_link" onClick={(e: React.MouseEvent) => {fix_selected_classes(e);set_selected_tab('model_performance');}}>Model Performace</button>
+            <button className="tab_link" onClick={(e: React.MouseEvent) => {fix_selected_classes(e);set_selected_tab('settings');}}>Settings</button>
         </div>
     );
 }

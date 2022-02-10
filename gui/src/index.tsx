@@ -1,11 +1,13 @@
-import { AssetPosition, AssetTrade } from '@components/Positions';
-import TabBar from '@components/Tabs';
-import Trades from '@components/Trades';
-import PriceGraphs from '@components/PriceGraphs';
-import ModelPerformance from '@components/ModelPerformance';
-import Settings from '@components/Settings';
+import { AssetPosition, AssetTrade } from './components/Positions';
+import TabBar from './components/Tabs';
+import Trades from './components/Trades';
+import PriceGraphs from './components/PriceGraphs';
+import ModelPerformance from './components/ModelPerformance';
+import Settings from './components/Settings';
 import React from 'react';
 import ReactDOM from 'react-dom';
+
+import { main_loop } from './loop'
 
 import '@assets/styles/base.css';
 import '@assets/styles/icons.css';
@@ -14,6 +16,8 @@ import '@assets/styles/main.css';
 function main_init() {
     console.log('Hello from js');
     console.log('Create tabs');
+
+    document.getElementById('default_tab')?.click()
 
     console.log('Do POST');
     const request = new XMLHttpRequest();
@@ -30,13 +34,9 @@ function main_init() {
         }
     };
 
-    //Create ETH asset
-    //var eth = new Asset('ETH', 'Ethereum');
-    //eth.generate_asset_position();
-    //eth.generate_upcoming_trade();
+    setInterval(main_loop, 1000);
+    main_loop();
 }
-
-main_init();
 
 interface TABS_INTERFACE {
     [key: string]: JSX.Element;
@@ -102,18 +102,10 @@ ReactDOM.render(
             congue nihil imperdiet doming id quod mazim placerat facer possim
             assum.
         </div>
-        <div
-            className="column centre_column"
-            id="centre_column"
-            style={{ borderLeftStyle: 'solid', borderWidth: '0.15em' }}
-        >
+        <div className="column centre_column" id="centre_column" style={{ borderLeftStyle: 'solid', borderWidth: '0.15em' }}>
             <div id="centre_tabs"></div>
         </div>
-        <div
-            className="column side_column"
-            id="right_sidebar"
-            style={{ borderLeftStyle: 'solid', borderWidth: '0.15em' }}
-        >
+        <div className="column side_column" id="right_sidebar" style={{ borderLeftStyle: 'solid', borderWidth: '0.15em' }}>
             <h2>Upcoming trades</h2>
             <hr className="title_separator" />
             <div id="upcoming_trades_container"></div>
@@ -133,4 +125,10 @@ ReactDOM.render(
     document.getElementById('root')
 );
 
-ReactDOM.render(<App />, document.getElementById('centre_tabs'));
+
+let p = new Promise((resolve) => {
+    ReactDOM.render(<App />, document.getElementById('centre_tabs'));
+    resolve(true);
+});
+p.then(main_init);
+
