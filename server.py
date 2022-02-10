@@ -17,7 +17,7 @@ class RequestHandler(RequestHandlerParent):
 			#Send to path handler
 			cb_idx = self.__class__._shared_borg_state.get('valid_get_paths', []).index(self.path)
 			self.__class__._shared_borg_state.get('get_callbacks', [])[cb_idx](self) #Pass the RequestHandler to the path handler
-		elif(os.path.splitext(self.path)[1][1:] == 'jsx'):
+		elif(os.path.splitext(self.path)[1][1:] == 'jsx' or os.path.splitext(self.path)[1][1:] == 'js'):
 			handle_get_file(self)
 		else:
 			self.send_response(418)
@@ -90,7 +90,7 @@ def handle_get_file(request: RequestHandler, base_path='gui/'):
 
 	path = os.path.join(base_path, path[1:]) #Remove the leading /
 
-	if(os.path.splitext(path)[1][1:] == 'jsx'):
+	if(os.path.splitext(path)[1][1:] == 'jsx' or os.path.splitext(path)[1][1:] == 'js'):
 		#Check it exists first
 		if(not os.path.isfile(path)):
 			print('Does not exist {}'.format(path))
