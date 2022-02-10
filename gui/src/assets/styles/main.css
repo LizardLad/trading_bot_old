@@ -1,0 +1,144 @@
+body {
+    overflow: hidden;
+    margin: 0px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Open sans', sans-serif;
+    font-weight: 300;
+}
+
+.main_columns {
+    height: 100%;
+}
+
+.column {
+    float: left;
+    padding: 20px;
+    height: 100%;
+}
+
+.side_column {
+    padding-top: 0px;
+    width: 16.9%;
+}
+
+.centre_column {
+    width: 66.2%;
+}
+
+.main_columns::after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+.title_separator {
+    margin-bottom: 15px;
+}
+
+.tab_links {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+.tab_links button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+}
+
+.tab_links button::hover {
+    background-color: #ddd;
+}
+
+.tab_links button.active {
+    background-color: #ccc;
+}
+
+.tab_content {
+    /*display: none;*/
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+
+.position_column {
+    float: left;
+    padding: 0px;
+    width: 100%;
+}
+
+.position_symbol {
+    width: 1em;
+}
+
+.position_left_col {
+    width: calc((98% - 2.5em) / 2);
+}
+
+.position_right_col {
+    width: calc((98% - 2.5em) / 2);
+}
+
+.position_container::after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+.position_column {
+    padding: 10px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.position_symbol {
+    margin-top: 0.5em;
+    margin-right: 0.5em;
+}
+
+.upcoming_trade_column {
+    float: left;
+    padding: 0px;
+    width: 100%;
+}
+
+.upcoming_trade_symbol {
+    width: 1em;
+}
+
+.upcoming_trade_left_col {
+    width: calc((98% - 2.5em) / 2);
+}
+
+.upcoming_trade_right_col {
+    width: calc((98% - 2.5em) / 2);
+}
+
+.upcoming_trade_container::after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+.upcoming_trade_column {
+    padding: 10px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.upcoming_trade_symbol {
+    margin-top: 0.5em;
+    margin-right: 0.5em;
+}
