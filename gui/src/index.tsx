@@ -30,12 +30,9 @@ function main_init() {
     request.onreadystatechange = (e) => {
         if (request.readyState === 4) {
             console.log(request);
-        } else {
         }
     };
-
-    setInterval(main_loop, 1000);
-    main_loop();
+    main_loop('init');
 }
 
 interface TABS_INTERFACE {
@@ -103,7 +100,9 @@ ReactDOM.render(
             assum.
         </div>
         <div className="column centre_column" id="centre_column" style={{ borderLeftStyle: 'solid', borderWidth: '0.15em' }}>
-            <div id="centre_tabs"></div>
+            <div id="centre_tabs">
+                <App />
+            </div>
         </div>
         <div className="column side_column" id="right_sidebar" style={{ borderLeftStyle: 'solid', borderWidth: '0.15em' }}>
             <h2>Upcoming trades</h2>
@@ -127,7 +126,7 @@ ReactDOM.render(
 
 
 let p = new Promise((resolve) => {
-    ReactDOM.render(<App />, document.getElementById('centre_tabs'));
+    //ReactDOM.render(<App />, document.getElementById('centre_tabs'));
     resolve(true);
 });
 p.then(main_init);
