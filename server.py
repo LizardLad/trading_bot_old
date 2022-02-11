@@ -141,7 +141,7 @@ if(__name__ == '__main__'):
 	valid_get_paths = ['/status', '/', '/main.js', '/styles/main.css', '/styles/base.css', '/styles/icons.css', '/index.html', '/positions.js']
 	get_callbacks = [handle_get_status, handle_get_file, handle_get_file, handle_get_file, handle_get_file, handle_get_file, handle_get_file, handle_get_file, handle_get_file]
 
-	valid_post_paths = ['/set/confidence_threshold']
+	valid_post_paths = ['/api/set/confidence_threshold']
 	post_callbacks = [set_confidence]
 
 	server.register_path_cb(valid_get_paths, get_callbacks, get=True)

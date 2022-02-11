@@ -21,7 +21,7 @@ function main_init() {
 
     console.log('Do POST');
     const request = new XMLHttpRequest();
-    const url = '/set/confidence_threshold';
+    const url = '/api/set/confidence_threshold';
     request.open('POST', url);
     request.setRequestHeader('Content-type', 'application/json');
     var data: object = { key: 'value', deez: 'nutz' };

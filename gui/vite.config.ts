@@ -11,5 +11,12 @@ export default defineConfig({
             '@components': path.resolve(__dirname, 'src/components'),
             '@testing': path.resolve(__dirname, 'src/testing')
         }
-    }
+    },
+    server: {
+    proxy: {
+        '/api': {
+            target: 'http://localhost:8080',
+            changeOrigin: false
+        }
+    }}
 });
