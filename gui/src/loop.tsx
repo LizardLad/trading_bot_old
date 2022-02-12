@@ -1,13 +1,11 @@
 import { AssetPosition, AssetTrade } from './components/Positions';
-import TabBar from './components/Tabs';
+import {TabsContainer} from './components/Tabs';
 import Trades from './components/Trades';
 import PriceGraphs from './components/PriceGraphs';
 import ModelPerformance from './components/ModelPerformance';
 import Settings from './components/Settings';
 import React from 'react';
 import ReactDOM from 'react-dom';
-
-import App from './index'
 
 var next_timeout_id: NodeJS.Timeout;
 
@@ -41,7 +39,7 @@ export function main_loop(caller: string) {
 			</div>
 			<div className="column centre_column" id="centre_column" style={{ borderLeftStyle: 'solid', borderWidth: '0.15em' }}>
 				<div id="centre_tabs">
-					<App />
+					<TabsContainer />
 				</div>
 			</div>
 			<div className="column side_column" id="right_sidebar" style={{ borderLeftStyle: 'solid', borderWidth: '0.15em' }}>
