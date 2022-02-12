@@ -1,0 +1,54 @@
+.trade_decision_buttons {
+	width: 100%;
+}
+
+.trade_decision_button {
+	border: none;
+	text-align: center;
+	text-decoration: none;
+	width: 48%;
+	font-size: 16px;
+	padding: 10px;
+	border-radius: 8px;
+	color: white;
+}
+
+.accept_button {
+	background-color: #4caf50;
+	float: left;
+}
+
+.reject_button {
+	background-color: #f44336;
+	float: right;
+}
+
+.upcoming_trade_container {
+	border:black;
+	border-width: 2px;
+	border-style: solid;
+	padding-bottom: 10px;
+	padding-left: 10px;
+	padding-right: 10px;
+	border-radius: 8px;
+	margin-bottom: 10px;
+}
+
+.position_container {
+	border:black;
+	border-width: 2px;
+	border-style: solid;
+	padding-bottom: 10px;
+	padding-left: 10px;
+	padding-right: 10px;
+	border-radius: 8px;
+	margin-bottom: 10px;
+}
+
+.percentage_gain {
+	color: #4caf50;
+}
+
+.percentage_loss {
+	color: #f44336;
+}
