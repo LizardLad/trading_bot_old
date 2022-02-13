@@ -3,3 +3,4 @@ libcrypto/build/*
 __pycache__/
 gui/node_modules
 gui/dist
+gui/package-lock.json
