@@ -1,4 +1,4 @@
-export {AssetPosition, AssetTrade};
+export {AssetPosition, AssetTrade, format_number, format_percentage};
 
 import './positions.css';
 

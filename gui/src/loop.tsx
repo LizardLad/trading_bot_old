@@ -1,6 +1,6 @@
 import { AssetPosition, AssetTrade } from './components/Positions';
 import {TabsContainer} from './components/Tabs';
-import Trades from './components/Trades';
+import {Trades} from './components/Trades';
 import PriceGraphs from './components/PriceGraphs';
 import ModelPerformance from './components/ModelPerformance';
 import Settings from './components/Settings';

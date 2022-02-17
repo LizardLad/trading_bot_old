@@ -1,4 +1,4 @@
-import Trades from '../Trades';
+import {Trades, get_historical_trades} from '../Trades';
 import PriceGraphs from '../PriceGraphs';
 import ModelPerformance from '../ModelPerformance';
 import Settings from '../Settings';
@@ -29,7 +29,7 @@ interface TABS_INTERFACE {
 }
 
 const TABS: TABS_INTERFACE = {
-    trades: <Trades />,
+    trades: <Trades trades={get_historical_trades()}/>,
     price_graphs: <PriceGraphs />,
     model_performance: <ModelPerformance />,
     settings: <Settings />,
