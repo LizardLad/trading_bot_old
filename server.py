@@ -16,6 +16,7 @@ class RequestHandler(RequestHandlerParent):
 		if(self.path in self.__class__._shared_borg_state.get('valid_get_paths', [])):
 			#Send to path handler
 			cb_idx = self.__class__._shared_borg_state.get('valid_get_paths', []).index(self.path)
+			#print('Handler: {}'.format(self.__class__._shared_borg_state.get('get_callbacks', [])[cb_idx]))
 			self.__class__._shared_borg_state.get('get_callbacks', [])[cb_idx](self) #Pass the RequestHandler to the path handler
 		elif(os.path.splitext(self.path)[1][1:] == 'jsx' or os.path.splitext(self.path)[1][1:] == 'js'):
 			handle_get_file(self)
@@ -136,10 +137,32 @@ def set_confidence(request, data):
 	request.end_headers()
 	request.wfile.write('Set trade confidence: {}'.format(trade_confidence).encode('utf-8'))
 
+def get_confidence_threshold(request):
+	request.send_response(200)
+	request.send_header('Content-type', 'text/text')
+	request.end_headers()
+	request.wfile.write(str(trade_confidence).encode('utf-8'))
+
+def get_api_key(request):
+	request.send_response(200)
+	request.send_header('Content-type', 'text/text')
+	request.end_headers()
+	request.wfile.write('api_key_server'.encode('utf-8'))
+
+def get_token(request):
+	request.send_response(200)
+	request.send_header('Content-type', 'text/text')
+	request.end_headers()
+	request.wfile.write('token_default_server'.encode('utf-8'))
+
 if(__name__ == '__main__'):
 	server = Server(8080)
-	valid_get_paths = ['/status', '/', '/main.js', '/styles/main.css', '/styles/base.css', '/styles/icons.css', '/index.html', '/positions.js']
-	get_callbacks = [handle_get_status, handle_get_file, handle_get_file, handle_get_file, handle_get_file, handle_get_file, handle_get_file, handle_get_file, handle_get_file]
+	valid_get_paths = ['/status', '/', '/main.js', '/styles/main.css', 
+	'/styles/base.css', '/styles/icons.css', '/index.html', '/positions.js', 
+	'/api/get/confidence_threshold', '/api/get/api_key', '/api/get/token']
+	get_callbacks = [handle_get_status, handle_get_file, handle_get_file, handle_get_file, 
+	handle_get_file, handle_get_file, handle_get_file, handle_get_file, 
+	get_confidence_threshold, get_api_key, get_token]
 
 	valid_post_paths = ['/api/set/confidence_threshold']
 	post_callbacks = [set_confidence]
