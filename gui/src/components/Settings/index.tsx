@@ -1,14 +1,10 @@
-export {Settings, get_api_key, get_token, get_trade_confidence};
+export { Settings };
 import './settings.css';
 import {format_number} from '../Positions';
 import React, { useRef } from 'react';
 import { make_request } from '../../utils/requests'
 
-interface APIKeyInputProps {
-	default_value: string;
-	callback: () => string;
-}
-
+interface APIKeyInputProps {}
 interface APIKeyInputState {
 	modified: boolean;
 	default: string;
@@ -23,7 +19,7 @@ class APIKeyInput extends React.Component<APIKeyInputProps, APIKeyInputState> {
 		this.promise_list = [];
 		this.state = {
 			modified: false,
-			default: props.default_value
+			default: 'api_key_default'
 		}
 		
 		this.onChange = this.onChange.bind(this);
@@ -83,11 +79,7 @@ class APIKeyInput extends React.Component<APIKeyInputProps, APIKeyInputState> {
 	}
 }
 
-interface TokenInputProps {
-	default_value: string;
-	callback: () => string;
-}
-
+interface TokenInputProps {}
 interface TokenInputState {
 	modified: boolean;
 	default: string;
@@ -102,7 +94,7 @@ class TokenInput extends React.Component<TokenInputProps, TokenInputState> {
 		this.__ismounted = false;
 		this.state = {
 			modified: false,
-			default: props.default_value
+			default: 'token_default'
 		}
 		
 		this.onChange = this.onChange.bind(this);
@@ -162,11 +154,7 @@ class TokenInput extends React.Component<TokenInputProps, TokenInputState> {
 	}
 }
 
-interface ConfidenceInputProps {
-	default_value: number;
-	callback: () => number;
-}
-
+interface ConfidenceInputProps {}
 interface ConfidenceInputState {
 	modified: boolean;
 	default: string;
@@ -179,10 +167,9 @@ class ConfidenceInput extends React.Component<ConfidenceInputProps, ConfidenceIn
 		super(props);
 		this.__ismounted = false;
 		this.promise_list = [];
-
 		this.state = {
 			modified: false,
-			default: String(props.default_value)
+			default: String(0.00)
 		}
 		
 		this.onChange = this.onChange.bind(this);
@@ -246,35 +233,17 @@ class ConfidenceInput extends React.Component<ConfidenceInputProps, ConfidenceIn
 	}
 }
 
-type SettingsProps = {
-	api_key: string,
-	token: string,
-	trade_confidence: number
-}
-
-function Settings({api_key, token, trade_confidence}: SettingsProps) {
+function Settings() {
 	return (
 		<div className='tab_content'>
 			Settings such as API key, confidence level etc go here
 			<br />
 			<br />
-			<APIKeyInput default_value={api_key} callback={get_api_key}/>
+			<APIKeyInput />
 			<br />
-			<TokenInput default_value={token} callback={get_token}/>
+			<TokenInput />
 			<br />
-			<ConfidenceInput default_value={trade_confidence} callback={get_trade_confidence} />
+			<ConfidenceInput />
 		</div>
 	);
-}
-
-function get_api_key() {
-	return 'api_key_default';
-}
-
-function get_token() {
-	return 'token_default';
-}
-
-function get_trade_confidence() {
-	return 0.00;
 }

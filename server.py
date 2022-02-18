@@ -155,14 +155,69 @@ def get_token(request):
 	request.end_headers()
 	request.wfile.write('token_default_server'.encode('utf-8'))
 
+def get_trades(request):
+	request.send_response(200)
+	request.send_header('Content-type', 'application/javascript')
+	request.end_headers()
+
+	data = [{
+		'asset_id': 'ETH',
+		'asset_name': 'Ethereum',
+		'asset_count': 0.5, 
+		'buy_time': '2:00pm 01/01/2022', 
+		'buy_aud_value': 1500, 
+		'sell_time': '4:00pm 01/01/2022', 
+		'sell_aud_value': 1700
+	}]
+
+	request.wfile.write(json.dumps(data).encode('utf-8'))
+
+def get_positions(request):
+	request.send_response(200)
+	request.send_header('Content-type', 'application/javascript')
+	request.end_headers()
+
+	data = [{
+			'asset_id': 'ETH',
+			'asset_name': 'Ethereum',
+			'asset_count': 2.002,
+			'aud_value': 10000.00,
+			'percentage_change': 10
+		},
+		{
+			'asset_id': 'BTC',
+			'asset_name': 'Bitcoin',
+			'asset_count': 0.05,
+			'aud_value': 3000.00,
+			'percentage_change': -2
+		}]
+	request.wfile.write(json.dumps(data).encode('utf-8'))
+
+def get_upcoming_trades(request):
+	request.send_response(200)
+	request.send_header('Content-type', 'application/javascript')
+	request.end_headers()
+
+	data = [
+		{
+			'asset_id': 'ETH', 
+			'asset_count': 2.002, 
+			'aud_value': 10000.00, 
+			'timer': 30
+		}
+	]
+	request.wfile.write(json.dumps(data).encode('utf-8'))
+
 if(__name__ == '__main__'):
 	server = Server(8080)
 	valid_get_paths = ['/status', '/', '/main.js', '/styles/main.css', 
 	'/styles/base.css', '/styles/icons.css', '/index.html', '/positions.js', 
-	'/api/get/confidence_threshold', '/api/get/api_key', '/api/get/token']
+	'/api/get/confidence_threshold', '/api/get/api_key', '/api/get/token',
+	'/api/get/trades', '/api/get/positions', '/api/get/upcoming_trades']
 	get_callbacks = [handle_get_status, handle_get_file, handle_get_file, handle_get_file, 
 	handle_get_file, handle_get_file, handle_get_file, handle_get_file, 
-	get_confidence_threshold, get_api_key, get_token]
+	get_confidence_threshold, get_api_key, get_token,
+	get_trades, get_positions, get_upcoming_trades]
 
 	valid_post_paths = ['/api/set/confidence_threshold']
 	post_callbacks = [set_confidence]

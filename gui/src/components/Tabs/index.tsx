@@ -1,7 +1,7 @@
-import {Trades, get_historical_trades} from '../Trades';
+import { Trades } from '../Trades';
 import PriceGraphs from '../PriceGraphs';
 import ModelPerformance from '../ModelPerformance';
-import {Settings, get_api_key, get_token, get_trade_confidence} from '../Settings';
+import { Settings } from '../Settings';
 import React from 'react';
 
 function fix_selected_classes(e: React.MouseEvent) {
@@ -29,10 +29,10 @@ interface TABS_INTERFACE {
 }
 
 const TABS: TABS_INTERFACE = {
-    trades: <Trades trades={get_historical_trades()}/>,
+    trades: <Trades />,
     price_graphs: <PriceGraphs />,
     model_performance: <ModelPerformance />,
-    settings: <Settings api_key={get_api_key()} token={get_token()} trade_confidence={get_trade_confidence()}/>,
+    settings: <Settings />,
 };
 
 export function TabsContainer() {
