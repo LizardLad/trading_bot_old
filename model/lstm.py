@@ -117,7 +117,7 @@ def sigmoid(x):
 	if(isinstance(x, list)):
 		return list(map(lambda z: sigmoid(z), x))
 	else:
-		return 1.0/(1.0+exp(x))
+		return 1.0/(1.0+exp(-x))
 
 def tanh(x):
 	if(isinstance(x, list)):
@@ -147,9 +147,11 @@ def LSTMlayer(weight,x_t,h_tm1,c_tm1):
 	intermediate_3 = matadd(intermediate_1, intermediate_2)
 	#Element wise addition
 	s_t = matadd(intermediate_3, biases)
+
 	hunit = len(recurrent_kernel)
 	#print(f'hidden units: {hunit}')
 	i  = sigmoid(lstm_4_split(s_t, 0, hunit))
+	print(i)
 
 	f  = sigmoid(lstm_4_split(s_t, 1*hunit, 2*hunit))
 
@@ -178,11 +180,12 @@ def LSTMlayerNp(weight,x_t,h_tm1,c_tm1):
 	intermediate_2 = np.matmul(h_tm1, recurrent_kernel)
 	#Element wise addition
 	s_t = intermediate_1 + intermediate_2 + biases
-
+	
 	#print(f's_t shape: {s_t.shape}')
 	hunit = recurrent_kernel.shape[0]
 	#print(f'hidden units: {hunit}')
 	i  = np_sigmoid(s_t[:,:hunit])
+	print(i)
 	#print(f'i shape: {i.shape}')
 	f  = np_sigmoid(s_t[:,1*hunit:2*hunit])
 	#print(f'f shape: {f.shape}')
@@ -196,7 +199,7 @@ def LSTMlayerNp(weight,x_t,h_tm1,c_tm1):
 	#print(f'h_t shape: {h_t.shape}')
 	return(h_t,c_t)
 
-inputs = [0.003, 0.002, 1]
+inputs = [0.003]#, 0.002, 1]
 weights = [
 	#Kernel
 	[[-0.11138653755187988, 0.22896693646907806, -0.602969229221344, 0.4399285614490509, 0.4782624840736389, 0.03746636584401131, -0.44716590642929077, 0.10910264402627945, 0.41209378838539124, -0.10412748157978058, 0.13623058795928955, -0.7182826399803162]],
