@@ -149,7 +149,6 @@ def LSTMlayer(weight,x_t,h_tm1,c_tm1):
 	s_t = matadd(intermediate_3, biases)
 	hunit = len(recurrent_kernel)
 	#print(f'hidden units: {hunit}')
-	lstm_4_split(s_t, 0, hunit)
 	i  = sigmoid(lstm_4_split(s_t, 0, hunit))
 
 	f  = sigmoid(lstm_4_split(s_t, 1*hunit, 2*hunit))
@@ -165,43 +164,37 @@ def LSTMlayer(weight,x_t,h_tm1,c_tm1):
 	
 	return(h_t,c_t)
 
+def np_sigmoid(x):
+    return(1.0/(1.0+np.exp(-x)))
 def LSTMlayerNp(weight,x_t,h_tm1,c_tm1):
-    #print(f'Input shapes: x: {x_t.shape}, h: {h_tm1.shape}, c: {c_tm1.shape}')
-    kernel = np.array(weight[0])
-    recurrent_kernel = np.array(weight[1])
-    biases = np.array(weight[2])
-    #print(f'Weight shapes: kernel: {np.array(kernel).shape}, recurrent_kernel: {np.array(recurrent_kernel).shape}, biases: {np.array(biases).shape}')
-    
-    #Another matmul
-    intermediate_1 = x_t.dot(kernel)
-    matmul_1 = np.matmul(x_t, kernel)
-    is_matmul_same = np.all(intermediate_1 == matmul_1)
-    #print(f'Is matmul same: {is_matmul_same}')
-    #print(f'Intermediate_1 shape: {intermediate_1.shape}')
-    #Another matmul
-    intermediate_2 = h_tm1.dot(recurrent_kernel)
-    #print(f'Intermediate_2 shape: {intermediate_2.shape}')
+	#print(f'Input shapes: x: {x_t.shape}, h: {h_tm1.shape}, c: {c_tm1.shape}')
+	kernel = np.array(weight[0])
+	recurrent_kernel = np.array(weight[1])
+	biases = np.array(weight[2])
+
+	#Another matmul
+	intermediate_1 = np.matmul(x_t, kernel)
+	#Another matmul
+	intermediate_2 = np.matmul(h_tm1, recurrent_kernel)
 	#Element wise addition
-    intermediate_3 = intermediate_1 + intermediate_2
-    #print(f'Intermediate_3 shape: {intermediate_3.shape}')
-	#Element wise addition
-    s_t = (x_t.dot(kernel) + h_tm1.dot(recurrent_kernel) + biases)
-    #print(f's_t shape: {s_t.shape}')
-    hunit = recurrent_kernel.shape[0]
-    #print(f'hidden units: {hunit}')
-    i  = sigmoid(s_t[:,:hunit])
-    #print(f'i shape: {i.shape}')
-    f  = sigmoid(s_t[:,1*hunit:2*hunit])
-    #print(f'f shape: {f.shape}')
-    _c = np.tanh(s_t[:,2*hunit:3*hunit])
-    #print(f'_c shape: {_c.shape}')
-    o  = sigmoid(s_t[:,3*hunit:])
-    #print(f'o shape: {o.shape}')
-    c_t = i*_c + f*c_tm1
-    #print(f'c_t shape: {c_t.shape}')
-    h_t = o*np.tanh(c_t)
-    #print(f'h_t shape: {h_t.shape}')
-    return(h_t,c_t)
+	s_t = intermediate_1 + intermediate_2 + biases
+
+	#print(f's_t shape: {s_t.shape}')
+	hunit = recurrent_kernel.shape[0]
+	#print(f'hidden units: {hunit}')
+	i  = np_sigmoid(s_t[:,:hunit])
+	#print(f'i shape: {i.shape}')
+	f  = np_sigmoid(s_t[:,1*hunit:2*hunit])
+	#print(f'f shape: {f.shape}')
+	_c = np.tanh(s_t[:,2*hunit:3*hunit])
+	#print(f'_c shape: {_c.shape}')
+	o  = np_sigmoid(s_t[:,3*hunit:])
+	#print(f'o shape: {o.shape}')
+	c_t = i*_c + f*c_tm1
+	#print(f'c_t shape: {c_t.shape}')
+	h_t = o*np.tanh(c_t)
+	#print(f'h_t shape: {h_t.shape}')
+	return(h_t,c_t)
 
 inputs = [0.003, 0.002, 1]
 weights = [
