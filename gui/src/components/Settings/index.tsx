@@ -157,7 +157,7 @@ class TokenInput extends React.Component<TokenInputProps, TokenInputState> {
 interface ConfidenceInputProps {}
 interface ConfidenceInputState {
 	modified: boolean;
-	default: string;
+	default: number;
 }
 
 class ConfidenceInput extends React.Component<ConfidenceInputProps, ConfidenceInputState> {
@@ -169,7 +169,7 @@ class ConfidenceInput extends React.Component<ConfidenceInputProps, ConfidenceIn
 		this.promise_list = [];
 		this.state = {
 			modified: false,
-			default: String(0.00)
+			default: 0.00
 		}
 		
 		this.onChange = this.onChange.bind(this);
@@ -187,7 +187,7 @@ class ConfidenceInput extends React.Component<ConfidenceInputProps, ConfidenceIn
 				while(this.__ismounted != true) {
 					await sleep(1);
 				}
-				this.setState({default: format_number(Number(response))});
+				this.setState({default: Number(response)});
 				//Remove promise from list
 				for(var i = 0; i < this.promise_list.length; i++) {
 					if(this.promise_list[i].id == id) {
@@ -219,16 +219,25 @@ class ConfidenceInput extends React.Component<ConfidenceInputProps, ConfidenceIn
 		}
 		
 		let target = e.target  as HTMLInputElement;
+
+		/*if(target.type == 'number') {
+			if()
+		}*/
+
 		var strings: string = target.value
 		strings = strings.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');
-		this.setState({default: strings});
+		this.setState({default: Number(target.value)});
 	}
 
 	render() {
 		return (<>
 			<p className='settings_label'>Trade Confidence Input:</p>
-			<input type='text' name='trade_confidence_input' className='text_input' 
-			        onChange={this.onChange} value={this.state.default} />
+			<p style={{margin: 0}}>{this.state.default}%</p>
+			<input type='range' name='trade_confidence_input' className='range_input'
+					min='0.01' max='100.00' step='0.01'
+					onChange={this.onChange} value={this.state.default} />
+			<input type='number' style={{width: '18px', border: 'none', padding: 0}} onChange={this.onChange} value={this.state.default}
+			  step='0.01'/>
 		</>);
 	}
 }
@@ -244,6 +253,12 @@ function Settings() {
 			<TokenInput />
 			<br />
 			<ConfidenceInput />
+			<br />
+			<button onClick={(e: React.MouseEvent) => {save_information_to_server()}}>Submit</button>
 		</div>
 	);
+}
+
+function save_information_to_server() {
+	return;
 }

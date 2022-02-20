@@ -3,7 +3,7 @@ import json
 import http.server
 from gi.repository import GLib
 
-trade_confidence = 0.9
+trade_confidence = 90.0
 
 class RequestHandlerParent(http.server.BaseHTTPRequestHandler):
 	_shared_borg_state = {}

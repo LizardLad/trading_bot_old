@@ -11,3 +11,11 @@
 	font-weight: 300;
 	width: 50%;
 }
+
+.range_input {
+	width: 50%;
+}
+
+.up_down_buttons {
+	height: calc(auto/2);
+}
