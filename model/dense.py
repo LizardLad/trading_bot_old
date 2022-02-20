@@ -1,44 +1,34 @@
-def relu(x):
-	return max([0, x])
+from nn_ops import noop, relu, matrix, matmul, matadd
 
-def clear(x):
-	return x
-
-def dense(weights_list, biases, input, activation):
-	#Input should be [1, 2, 3, 4, 5, 6, ...] 1D
-	outputs = []
-	for i, bias in enumerate(biases):
-		sum = 0
-		for j, weight in enumerate(weights_list[i]):
-			sum += weight * input[j]
-		neuron = sum + bias
-		neuron = activation(neuron)
-		outputs.append(neuron)
-	return outputs
+def dense(weights, input, activation):
+	#Input should be [[1, 2, 3, 4, 5, 6, ...]] 2D (1,None)
+	#biases should be [1,2,3,4,5,...] 1D
+	biases = weights[1]
+	weights = weights[0]
+	result = matmul(input, weights.transpose().tolist())
+	return matadd([biases], result)
 
 layers = []
 #Layer 0
-weights = \
-[
+weights = matrix([
 	[1.3, 1.3], #Neuron 0 weights
 	[1.2, 1.2]  #Neuron 1 weights
-]
+], 2, 2)
 biases = [-1.3, 0] #Neuron 0 and 1 biases respectively 
 layers.append([weights, biases])
 #Layer 1
-weights = \
+weights = matrix(
 [
 	[-1.5, 0.8] #Neuron 0
-]
+], 1, 2)
 biases = [0]
 layers.append([weights, biases])
 
-input = [1, 0]
+input = [[0,0]]
+output = input
 for i, layer in enumerate(layers):
-	weights = layer[0]
-	biases = layer[1]
 	if(i != len(layers) - 1):
-		input = dense(weights, biases, input, relu)
+		output = dense(layer, output, relu)
 	else:
-		output = dense(weights, biases, input, clear)
+		output = dense(layer, output, noop)[0] #(1,None) to (None,) shape
 print(output)
