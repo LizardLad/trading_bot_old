@@ -1,20 +1,12 @@
-#include <stdbool.h>
+#include <sys/time.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <stdio.h>
-#include <math.h>
 #include <time.h>
-#include <sys/time.h>
 #include <cblas.h>
 
-typedef enum {ROW, COLUM} MAJOR;
-
-struct matrix_f {
-	float *data;
-	int x; //Number of rows
-	int y; //Number of columns
-	MAJOR major;
-};
+#include "matrix.h";
 
 double diff_ms(struct timespec start, struct timespec end)
 {
@@ -34,8 +26,6 @@ double diff_ms(struct timespec start, struct timespec end)
 }
 
 int matmul(struct matrix_f a, struct matrix_f b, struct matrix_f *result) {
-	//Init result
-	result->major=ROW;
 	result->x=a.x;
 	result->y=b.y;
 	
@@ -52,26 +42,26 @@ int matmul(struct matrix_f a, struct matrix_f b, struct matrix_f *result) {
 	return 0;
 }
 
-int main() {
-	printf("%s\n",openblas_get_config());
-
-	struct matrix_f a = {.x=100, .y=100, .major=ROW};
+/*int main() {
+	struct matrix_f a = {.x=1000, .y=1000};
 	a.data = (float *)malloc(a.x*a.y * sizeof(float));
+	for(int i = 0; i < a.x*a.y+1; i++) {
+		a.data[i] = (float) i;
+	}
 
-	struct matrix_f b = {.x=100, .y=100, .major=ROW};
+	struct matrix_f b = {.x=1000, .y=1000};
 	b.data = (float *)malloc(b.x*b.y * sizeof(float));
+	for(int i = 0; i < b.x*b.y+1; i++) {
+		b.data[i] = (float) i;
+	}
 
 	struct matrix_f c = {0};
 
-	struct timeval start, end;
-	gettimeofday(&start, NULL);
 	matmul(a, b, &c);
-	gettimeofday(&end, NULL);
-	printf("Time taken: %lf ms\n", ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec))/1000.0);
-	
+
 	free(c.data);
 	free(a.data);
 	free(b.data);
 
 	return 0;
-}
+}*/

@@ -71,3 +71,45 @@ print('c3 = {}'.format(c_tm1))
 print('LSTMLayer')
 output = LSTMLayer(weights, inputs, return_sequences=True)
 print('output = {}'.format(output))
+
+#Print weights in C
+fp = open('model.c', 'w')
+layer_name = 'lstm_1'
+fp.write('#include <stdio.h>\n')
+fp.write('#include "matrix.h"\n')
+fp.write('#include "lstm.h"\n')
+
+def write_lstm_weights_as_c(fp, weights, layer_name):
+	kernel = weights[0]
+	recurrent_kernel = weights[1]
+	bias = weights[2]
+	kernel_str = ' '.join([f'{weight:.20f},' for weight in kernel[0]])
+	recurrent_kernel_str = ' '.join([' '.join([f'{weight:.20f},' for weight in row]) for row in recurrent_kernel])
+	bias_str = ' '.join([f'{weight:.20f},' for weight in bias])
+	fp.write('float {}_kernel_weights[] = {}\n'.format(layer_name, '{' + kernel_str + '};' ))
+	fp.write('struct matrix_f {layer_name}_kernel = '.format(layer_name=layer_name)+'{'+'.x={}, .y={}, .data={layer_name}_kernel_weights'.format(len(kernel), len(kernel[0]), layer_name=layer_name)+'};\n')
+	fp.write('float {}_recurrent_kernel_weights[] = {}\n'.format(layer_name, '{' + recurrent_kernel_str + '};'))
+	fp.write('struct matrix_f {layer_name}_recurrent_kernel = '.format(layer_name=layer_name)+'{'+'.x={}, .y={}, .data={layer_name}_recurrent_kernel_weights'.format(len(recurrent_kernel), len(recurrent_kernel[0]), layer_name=layer_name)+'};\n')
+	fp.write('float {}_bias_weights[] = {}\n'.format(layer_name, '{' + bias_str + '};'))
+	fp.write('struct matrix_f {layer_name}_bias = '.format(layer_name=layer_name)+'{'+'.x={}, .y={}, .data={layer_name}_bias_weights'.format(1, len(bias), layer_name=layer_name)+'};\n')
+
+	#Input shapes
+	input_x = 1
+	input_y = len(kernel)
+	#Sequence length is irrelevant
+
+	return_sequences = True
+
+	#Output shapes
+	output_x = -1 if return_sequences else 1
+	output_y = len(recurrent_kernel)
+	#Sequence length is irrelevant
+	
+	return_sequences = 'true' if return_sequences else 'false'
+	
+
+	fp.write('struct lstm_layer {} = '.format(layer_name) + '{' + '.kernel=&{}, .recurrent_kernel=&{}, .bias=&{}, .input_x={}, .input_y={}, .output_x={}, .output_y={}, .return_sequences={}'.format(layer_name+'_kernel', layer_name+'_recurrent_kernel', layer_name+'_bias', input_x, input_y, output_x, output_y, return_sequences) + '};\n')
+	fp.write('int main(){printf("%f", lstm_1_kernel_weights[0]); return 0;}')
+
+write_lstm_weights_as_c(fp, weights, layer_name)
+fp.close()
