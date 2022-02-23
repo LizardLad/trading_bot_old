@@ -1,4 +1,5 @@
 #include <sys/time.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -25,17 +26,22 @@ double diff_ms(struct timespec start, struct timespec end)
         return ms;
 }
 
-int matmul(struct matrix_f a, struct matrix_f b, struct matrix_f *result) {
-	result->x=a.x;
-	result->y=b.y;
-	
-	float *result_p = (float *)malloc(sizeof(float) * result->x * result->y);
-	if(result_p == NULL) {return 1;}
-	result->data = result_p;
+int matmul(struct matrix_f a, struct matrix_f b, struct matrix_f *result, bool add) {
+	if(!add) { //If we are adding then result already has populated data
+		result->x=a.x;
+		result->y=b.y;
+		float *result_p = (float *)malloc(sizeof(float) * result->x * result->y);
+		if(result_p == NULL) {return 1;}
+		result->data = result_p;
+	}
 	
 	struct timespec start, end;
 	clock_gettime(CLOCK_REALTIME, &start);
-	cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, a.x, b.y, a.y, 1.0, a.data, a.y, b.data, b.y, 0.0, result->data, result->y);
+	if(!add) {
+		cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, a.x, b.y, a.y, 1.0, a.data, a.y, b.data, b.y, 0.0, result->data, result->y);
+	} else {
+		cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, a.x, b.y, a.y, 1.0, a.data, a.y, b.data, b.y, 1.0, result->data, result->y);
+	}
 	clock_gettime(CLOCK_REALTIME, &end);
 	printf("Time taken: %lf ms\n", diff_ms(start, end));	
 
@@ -65,3 +71,21 @@ int matmul(struct matrix_f a, struct matrix_f b, struct matrix_f *result) {
 
 	return 0;
 }*/
+
+
+struct matrix_f transpose(struct matrix_f matrix) {
+	struct matrix_f result = {0};
+    float *temp = (float *) malloc(sizeof(float) * matrix.x * matrix.y);
+	if(temp == NULL) {return result;}
+	result.data = temp;
+
+    for (int i = 0; i < matrix.x; i++) {      // i is row index
+        for (int j = 0; j < matrix.y; j++) {  // j is column index
+            result.data[j * matrix.x + i] = matrix.data[i * matrix.y + j];
+        }
+    }
+	result.y = matrix.x;
+	result.x = matrix.y;
+
+    return result;
+}
