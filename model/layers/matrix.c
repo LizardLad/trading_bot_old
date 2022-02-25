@@ -4,8 +4,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
-#include <time.h>
 #include <cblas.h>
+#include <math.h>
+#include <time.h>
 
 #include "matrix.h";
 
@@ -88,4 +89,65 @@ struct matrix_f transpose(struct matrix_f matrix) {
 	result.x = matrix.y;
 
     return result;
+}
+
+struct matrix_f sigmoid(struct matrix_f a) {
+	struct matrix_f result = {0};
+    float *temp = (float *) malloc(sizeof(float) * a.x * a.y);
+	if(temp == NULL) {return result;}
+	result.data = temp;
+	result.x = a.x;
+	result.y = a.y;
+
+	for(int i = 0; i < a.x; i++) {
+		for(int j = 0; j < a.y; j++) {
+			result.data[i*a.y+j] = 1.0/(1.0+expf(-a.data[i*a.y+j]));
+		}
+	}
+
+	return result;
+}
+
+struct matrix_f tanh(struct matrix_f a) {
+	struct matrix_f result = {0};
+    float *temp = (float *) malloc(sizeof(float) * a.x * a.y);
+	if(temp == NULL) {return result;}
+	result.data = temp;
+	result.x = a.x;
+	result.y = a.y;
+
+	for(int i = 0; i < a.x; i++) {
+		for(int j = 0; j < a.y; j++) {
+			result.data[i*a.y+j] = tanhf(a.data[i*a.y+j]);
+		}
+	}
+
+	return result;
+}
+
+int matadd(struct matrix_f a, struct matrix_f b, struct matrix_f *result) {
+	struct matrix_f result = {0};
+    float *temp = (float *) malloc(sizeof(float) * a.x * a.y);
+	if(temp == NULL) {return 1;}
+	result->data = temp;
+	result->x = a.x;
+	result->y = a.y;
+
+	for(int i = 0; i < a.x; i++) {
+		for(int j = 0; j < a.y; j++) {
+			result->data[i*a.y+j] = a.data[i*a.y+j] + b.data[i*a.y+j];
+		}
+	}
+
+	return 0;
+}
+
+int matelemul(struct matrix_f a, struct matrix_f *b) {
+	for(int i = 0; i < a.x; i++) {
+		for(int j = 0; j < a.y; j++) {
+			b->data[i*a.y+j] *= a.data[i*a.y+j];
+		}
+	}
+
+	return 0;
 }

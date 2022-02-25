@@ -80,3 +80,48 @@ int LSTMCell(struct matrix_f kernel, struct matrix_f recurrent_kernel,
 	
 	return 0;//(h_t,c_t);
 }
+
+struct lstm_sequence_io_node LSTMLayer(struct lstm_layer layer, 
+							struct lstm_sequence_io_node *input, bool return_sequences) {
+	
+	struct lstm_sequence_io_node result_head = {.next=NULL, .data=NULL};
+	struct lstm_sequence_io_node error = {0};
+
+	struct matrix_f h_tm1 = {.x=layer.output_x, .y=layer.output_y};
+	float *h_tm1_data = calloc(h_tm1.x*h_tm1.y, sizeof(float));
+	if(h_tm1_data == NULL) {return result_head;}
+
+	struct matrix_f c_tm1 = {.x=layer.output_x, .y=layer.output_y};
+	float *c_tm1_data = calloc(c_tm1.x*c_tm1.y, sizeof(float));
+	if(c_tm1_data == NULL) {return result_head;}
+	
+	while(input != NULL) {
+		struct matrix_f *result = malloc(sizeof(struct matrix_f));
+
+		LSTMCell(*(layer.kernel), *(layer.recurrent_kernel), 
+			 *(layer.bias), *(input->data), h_tm1, 
+			&c_tm1, result);
+		if(return_sequences) {
+			if(result_head.data == NULL) {
+				result_head.data = result;
+			}
+			else {
+				struct lstm_sequence_io_node *temp = &result_head;
+				while(temp->next != NULL) {
+					temp = temp->next;
+				}
+				//temp has the location to insert the new sequence
+				struct lstm_sequence_io_node *new = malloc(sizeof(struct lstm_sequence_io_node));
+				new->next = NULL;
+				new->data = result;
+				temp->next = new;
+			}
+		}
+		h_tm1 = *result;
+		float *h_tm1_data = malloc(sizeof(float)*h_tm1.x*h_tm1.y);
+		if(h_tm1_data == NULL) {return error;}
+		h_tm1.data = h_tm1_data;
+		memcpy(h_tm1.data, result->data, h_tm1.x*h_tm1.y*sizeof(float));
+	}
+	
+}
