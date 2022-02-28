@@ -15,6 +15,6 @@ struct matrix_f Dense(struct dense_layer layer, struct matrix_f input, struct ma
 	matadd(*(layer.bias), result, &after_bias);
 	free(result.data);
 	result = activation(after_bias);
-
+	free(after_bias.data);
 	return result;
 }
