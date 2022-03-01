@@ -5,7 +5,10 @@ import math
 ###
 
 def relu(x):
-	return max([0, x])
+	if(isinstance(x, list)):
+		return list(map(lambda z: relu(z), x))
+	else:
+		return max([0, x])
 
 def noop(x):
 	return x

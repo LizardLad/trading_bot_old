@@ -6,7 +6,9 @@ def dense(weights, input, activation):
 	biases = weights[1]
 	weights = weights[0]
 	result = matmul(input, weights.transpose().tolist())
-	return matadd([biases], result)
+	result = matadd([biases], result)
+	result = activation(result)
+	return result
 
 layers = []
 #Layer 0
@@ -25,6 +27,7 @@ biases = [0]
 layers.append([weights, biases])
 
 input = [[0,0]]
+print(input)
 output = input
 for i, layer in enumerate(layers):
 	if(i != len(layers) - 1):
@@ -42,10 +45,11 @@ layers = [[dense_1_weights, dense_1_bias], [dense_2_weights, dense_2_biases]]
 
 fp = open('model_dense.c', 'w')
 fp.write('#include <stdio.h>\n')
-fp.write('#include "matrix.h"\n')
-fp.write('#include "dense.h"\n')
+fp.write('#include "layers/matrix.h"\n')
+fp.write('#include "layers/dense.h"\n')
+fp.write('#include "layers/activations.h"\n\n')
 
-def write_dense_weights_as_c(fp, layer_weights, layer_name):
+def write_dense_weights_as_c(fp, layer_weights, layer_name, layer_activation):
 	weights = layer_weights[0]
 	bias = layer_weights[1]
 
@@ -64,7 +68,11 @@ def write_dense_weights_as_c(fp, layer_weights, layer_name):
 	output_x = 1
 	output_y = len(bias)
 
-	fp.write('struct dense_layer {} = '.format(layer_name) + '{' + '.weights=&{}_weights, .bias=&{}_bias, .output_x={}, .output_y={}, .input_x={}, .input_y={}'.format(layer_name, layer_name, output_x, output_y, input_x, input_y) + '};\n')
+	fp.write('struct dense_layer {} = '.format(layer_name) + '{' + '.weights=&{}_weights, .bias=&{}_bias, .output_x={}, .output_y={}, .input_x={}, .input_y={}, .activation={}'.format(layer_name, layer_name, output_x, output_y, input_x, input_y, activation) + '};\n')
 
-write_dense_weights_as_c(fp, layers[0], 'dense_1')
+#activation = layer.activation.__qualname__
+activation = 'relu'
+write_dense_weights_as_c(fp, layers[0], 'dense_1', activation)
+activation = 'noop'
+write_dense_weights_as_c(fp, layers[1], 'dense_2', activation)
 fp.close()	

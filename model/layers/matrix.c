@@ -8,7 +8,7 @@
 #include <math.h>
 #include <time.h>
 
-#include "matrix.h";
+#include "matrix.h"
 
 double diff_ms(struct timespec start, struct timespec end)
 {
@@ -108,7 +108,7 @@ struct matrix_f sigmoid(struct matrix_f a) {
 	return result;
 }
 
-struct matrix_f tanh(struct matrix_f a) {
+struct matrix_f tanh_mat(struct matrix_f a) {
 	struct matrix_f result = {0};
     float *temp = (float *) malloc(sizeof(float) * a.x * a.y);
 	if(temp == NULL) {return result;}
@@ -126,7 +126,6 @@ struct matrix_f tanh(struct matrix_f a) {
 }
 
 int matadd(struct matrix_f a, struct matrix_f b, struct matrix_f *result) {
-	struct matrix_f result = {0};
     float *temp = (float *) malloc(sizeof(float) * a.x * a.y);
 	if(temp == NULL) {return 1;}
 	result->data = temp;
@@ -150,4 +149,19 @@ int matelemul(struct matrix_f a, struct matrix_f *b) {
 	}
 
 	return 0;
+}
+
+void print_mat(struct matrix_f a) {
+	printf("Matrix Start %dx%d\n", a.x, a.y);
+	for(int i = 0; i < a.x; i++) {
+		for(int j = 0; j < a.y; j++) {
+			printf(" %f ", a.data[i*a.y+j]);
+			//break;
+		}
+		printf("\n");
+		//break;
+	}
+	printf("Matrix End\n");
+
+	return;
 }

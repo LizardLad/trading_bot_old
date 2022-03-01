@@ -44,7 +44,7 @@ int LSTMCell(struct matrix_f kernel, struct matrix_f recurrent_kernel,
 	struct matrix_f i, f, _c, o;
 	i  = sigmoid(split_1);
 	f  = sigmoid(split_2);
-	_c = tanh(split_3);
+	_c = tanh_mat(split_3);
 	o  = sigmoid(split_4);
 
 	free(split_1.data);
@@ -63,7 +63,7 @@ int LSTMCell(struct matrix_f kernel, struct matrix_f recurrent_kernel,
 	if(h_t_p == NULL) {return 1;}
 	struct matrix_f h_t = {.x=c_t.x, .y=c_t.y, .data=h_t_p};
 
-	h_t = tanh(c_t); //Final memory for result allocated here
+	h_t = tanh_mat(c_t); //Final memory for result allocated here
 	matelemul(o, &h_t); //Does not allocate memory
 
 	
