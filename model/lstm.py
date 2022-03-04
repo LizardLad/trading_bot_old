@@ -73,11 +73,11 @@ output = LSTMLayer(weights, inputs, return_sequences=True)
 print('output = {}'.format(output))
 
 #Print weights in C
-fp = open('model.c', 'w')
+fp = open('example_lstm.c', 'w')
 layer_name = 'lstm_1'
 fp.write('#include <stdio.h>\n')
-fp.write('#include "matrix.h"\n')
-fp.write('#include "lstm.h"\n')
+fp.write('#include "layers/matrix.h"\n')
+fp.write('#include "layers/lstm.h"\n')
 
 def write_lstm_weights_as_c(fp, weights, layer_name):
 	kernel = weights[0]

@@ -43,7 +43,7 @@ dense_2_biases = [0]
 
 layers = [[dense_1_weights, dense_1_bias], [dense_2_weights, dense_2_biases]]
 
-fp = open('model_dense.c', 'w')
+fp = open('example_dense.c', 'w')
 fp.write('#include <stdio.h>\n')
 fp.write('#include "layers/matrix.h"\n')
 fp.write('#include "layers/dense.h"\n')
@@ -75,4 +75,12 @@ activation = 'relu'
 write_dense_weights_as_c(fp, layers[0], 'dense_1', activation)
 activation = 'noop'
 write_dense_weights_as_c(fp, layers[1], 'dense_2', activation)
-fp.close()	
+fp.close()
+
+fp.write('int main() {\n\tfloat input_data[] = {1,1};\n\tstruct matrix_f input = {.x=1, .y=2, .data=input_data};\n\
+	\tstruct matrix_f result = {0};\n\
+	\tstruct matrix_f result_2 = {0};\n\
+	\tresult = Dense(dense_1, input);\n\
+	\tresult_2 = Dense(dense_2, result);\n\
+	\tprint_mat(result_2);\n\tfree(result.data);\n\tfree(result_2.data);\n\
+	\treturn 0;\n}')
