@@ -41,9 +41,9 @@ def LSTMLayer(weight, x, return_sequences=False):
 	return output
 
 inputs = [
-	[[0.003]], 
-	[[0.002]], 
-	[[1]]
+	#[[0.003]], 
+	[[0.002]]#, 
+	#[[1]]
 ]
 weights = [
 	#Kernel
@@ -58,6 +58,8 @@ weights = [
 	[0.1017896980047226, 0.36655518412590027, 0.11918659508228302, 1.094984531402588, 1.2538317441940308, 1.1026681661605835, 0.13135625422000885, 0.08208376914262772, 0.1961633265018463, 0.380307674407959, 0.3846043050289154, 0.1758234202861786]
 ]
 
+layers = [{'weights': weights, 'return_sequences': True, 'layer_name': 'lstm_1'}, {'weights': weights, 'return_sequences': False, 'layer_name': 'lstm_2'}]
+
 #Zero out state and hidden neurons first
 print('Pure Python')
 h_tm1 = [[0]*len(weights[1])]
@@ -69,7 +71,7 @@ print('h3 = {}'.format(h_tm1))
 print('c3 = {}'.format(c_tm1))
 
 print('LSTMLayer')
-output = LSTMLayer(weights, inputs, return_sequences=True)
+output = LSTMLayer(weights, inputs, return_sequences=False)
 print('output = {}'.format(output))
 
 #Print weights in C
@@ -79,7 +81,7 @@ fp.write('#include <stdio.h>\n')
 fp.write('#include "layers/matrix.h"\n')
 fp.write('#include "layers/lstm.h"\n')
 
-def write_lstm_weights_as_c(fp, weights, layer_name):
+def write_lstm_weights_as_c(fp, weights, layer_name, return_sequences):
 	kernel = weights[0]
 	recurrent_kernel = weights[1]
 	bias = weights[2]
@@ -98,10 +100,11 @@ def write_lstm_weights_as_c(fp, weights, layer_name):
 	input_y = len(kernel)
 	#Sequence length is irrelevant
 
-	return_sequences = True
+	#return_sequences = True
 
 	#Output shapes
 	output_x = -1 if return_sequences else 1
+	output_x = 1
 	output_y = len(recurrent_kernel)
 	#Sequence length is irrelevant
 	
@@ -109,7 +112,46 @@ def write_lstm_weights_as_c(fp, weights, layer_name):
 	
 
 	fp.write('struct lstm_layer {} = '.format(layer_name) + '{' + '.kernel=&{}, .recurrent_kernel=&{}, .bias=&{}, .input_x={}, .input_y={}, .output_x={}, .output_y={}, .return_sequences={}'.format(layer_name+'_kernel', layer_name+'_recurrent_kernel', layer_name+'_bias', input_x, input_y, output_x, output_y, return_sequences) + '};\n')
-	fp.write('int main(){printf("%f", lstm_1_kernel_weights[0]); return 0;}')
+	#fp.write('int main(){printf("%f", lstm_1_kernel_weights[0]); return 0;}')
 
-write_lstm_weights_as_c(fp, weights, layer_name)
+main_src = 'int main() {\n\tfloat input_data[] = {};\n'
+main_src += '\tstruct matrix_f input_mat = {.x=, .y=, .data=input_data};\n'
+main_src += '\tstruct lstm_sequence_io_node input = {.next=NULL, .data=&input_mat};\n'
+
+if(len(layers) >= 2):
+	main_src += '\tstruct lstm_sequence_io_node result = {0};\n'
+	main_src += '\tstruct lstm_sequence_io_node result_2 = {0};\n'
+else:
+	main_src += '\tstruct lstm_sequence_io_node result = {0};\n'
+
+last_output = ''
+for idx, layer in enumerate(layers):
+	weights = layer['weights']
+	layer_name = layer['layer_name']
+	return_sequences = layer['return_sequences']
+	if(idx == 0):
+		input_name = 'input'
+	elif((idx+1) % 2):
+		input_name = 'result_2'
+	else:
+		input_name = 'result'
+	write_lstm_weights_as_c(fp, weights, layer_name, return_sequences)
+	if((idx+1) % 2):
+		last_output = 'result'
+	else:
+		last_output = 'result_2'
+	if(idx > 1):
+		if(last_output == 'result'):
+			#Free result_2
+			main_src += '\tfree_lstm_sequence(result_2);\n'
+		else:
+			#Free result
+			main_src += '\tfree_lstm_sequence(result);\n'
+
+	main_src += '\t{} = LSTMLayer({}, &{});\n'.format(last_output, layer_name, input_name)
+
+main_src += '}'
+
+fp.write('\n{}'.format(main_src))
+
 fp.close()

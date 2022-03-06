@@ -77,7 +77,7 @@ int matmul(struct matrix_f a, struct matrix_f b, struct matrix_f *result, bool a
 struct matrix_f transpose(struct matrix_f matrix) {
 	struct matrix_f result = {0};
     float *temp = (float *) malloc(sizeof(float) * matrix.x * matrix.y);
-	if(temp == NULL) {return result;}
+	if(temp == NULL) {printf("malloc failed\n");return result;}
 	result.data = temp;
 
     for (int i = 0; i < matrix.x; i++) {      // i is row index

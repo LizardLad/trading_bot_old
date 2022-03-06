@@ -16,8 +16,11 @@ struct lstm_layer {
 };
 
 struct lstm_sequence_io_node {
-	struct lstm_output_node *next;
+	struct lstm_sequence_io_node *next;
 	struct matrix_f *data;
 };
+
+struct lstm_sequence_io_node LSTMLayer(struct lstm_layer layer, struct lstm_sequence_io_node *input);
+void free_lstm_sequence(struct lstm_sequence_io_node *sequence);
 
 #endif

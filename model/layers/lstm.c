@@ -1,5 +1,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 #include "lstm.h"
 #include "matrix.h"
@@ -14,7 +16,7 @@ struct matrix_f lstm_4_split(struct matrix_f a, int start, int end) {
 	//Easiest way is to transpose and then grab by rows
 
 	struct matrix_f transposed = transpose(a);
-	memcpy(split.data, transposed.data+start, end*sizeof(float));
+	memcpy(split.data, transposed.data+start, (end-start)*sizeof(float));
 	free(transposed.data);
 	transposed = transpose(split);
 	free(split.data);
@@ -53,7 +55,7 @@ int LSTMCell(struct matrix_f kernel, struct matrix_f recurrent_kernel,
 	free(split_4.data);
 
 	matelemul(i, &_c);
-	matelemul(f, &c_tm1);
+	matelemul(f, c_tm1);
 
 	struct matrix_f c_t;
 
@@ -82,18 +84,21 @@ int LSTMCell(struct matrix_f kernel, struct matrix_f recurrent_kernel,
 }
 
 struct lstm_sequence_io_node LSTMLayer(struct lstm_layer layer, 
-							struct lstm_sequence_io_node *input, bool return_sequences) {
+							struct lstm_sequence_io_node *input) {
 	
+	bool return_sequences = layer.return_sequences;
 	struct lstm_sequence_io_node result_head = {.next=NULL, .data=NULL};
 	struct lstm_sequence_io_node error = {0};
 
 	struct matrix_f h_tm1 = {.x=layer.output_x, .y=layer.output_y};
 	float *h_tm1_data = calloc(h_tm1.x*h_tm1.y, sizeof(float));
 	if(h_tm1_data == NULL) {return result_head;}
+	h_tm1.data = h_tm1_data;
 
 	struct matrix_f c_tm1 = {.x=layer.output_x, .y=layer.output_y};
 	float *c_tm1_data = calloc(c_tm1.x*c_tm1.y, sizeof(float));
 	if(c_tm1_data == NULL) {return result_head;}
+	c_tm1.data = c_tm1_data;
 	
 	while(input != NULL) {
 		struct matrix_f *result = malloc(sizeof(struct matrix_f));
@@ -122,6 +127,23 @@ struct lstm_sequence_io_node LSTMLayer(struct lstm_layer layer,
 		if(h_tm1_data == NULL) {return error;}
 		h_tm1.data = h_tm1_data;
 		memcpy(h_tm1.data, result->data, h_tm1.x*h_tm1.y*sizeof(float));
+		input = input->next;
 	}
-	
+	if(!return_sequences) {
+		struct matrix_f *result = malloc(sizeof(struct matrix_f));
+		if(result == NULL){return result_head;}
+		result->data = h_tm1.data;
+		result->x = h_tm1.x;
+		result->y = h_tm1.y;
+		result_head.data = result;
+	}
+	printf("exited normally\n");
+	return result_head;
+}
+
+void free_lstm_sequence(struct lstm_sequence_io_node *sequence) {
+	while(sequence != NULL) {
+		free(sequence->data->data);
+		sequence = sequence->next;
+	}
 }
