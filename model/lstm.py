@@ -1,4 +1,3 @@
-import re
 from nn_ops import matmul, matelemul, matadd, sigmoid, tanh
 
 def lstm_4_split(s_t, hunit_start, hunit_end):
@@ -16,9 +15,11 @@ def LSTMCell(weight,x_t,h_tm1,c_tm1):
 	intermediate_3 = matadd(intermediate_1, intermediate_2)
 	#Element wise addition
 	s_t = matadd(intermediate_3, biases)
+	
 
 	hunit = len(recurrent_kernel)
 	i  = sigmoid(lstm_4_split(s_t, 0, hunit))
+	print('i = {}'.format(i))
 	f  = sigmoid(lstm_4_split(s_t, 1*hunit, 2*hunit))
 	_c = tanh(lstm_4_split(s_t, 2*hunit, 3*hunit))
 	o  = sigmoid(lstm_4_split(s_t, 3*hunit, 4*hunit))
@@ -34,6 +35,7 @@ def LSTMLayer(weight, x, return_sequences=False):
 	c_t = [[0]*len(weight[1])]
 	for x_t in x:
 		h_t, c_t = LSTMCell(weight, x_t, h_t, c_t)
+		print('mid_output: {}'.format(h_t))
 		if(return_sequences):
 			output.extend(h_t)
 		else:
@@ -41,9 +43,9 @@ def LSTMLayer(weight, x, return_sequences=False):
 	return output
 
 inputs = [
-	#[[0.003]], 
-	[[0.002]]#, 
-	#[[1]]
+	[[0.003]], 
+	[[0.002]], 
+	[[1]]
 ]
 weights = [
 	#Kernel
@@ -57,6 +59,23 @@ weights = [
 	#Bias
 	[0.1017896980047226, 0.36655518412590027, 0.11918659508228302, 1.094984531402588, 1.2538317441940308, 1.1026681661605835, 0.13135625422000885, 0.08208376914262772, 0.1961633265018463, 0.380307674407959, 0.3846043050289154, 0.1758234202861786]
 ]
+
+#inputs = [
+#	[[10]], 
+#	[[20]], 
+#	[[30]]
+#]
+
+#weights = [
+#	#Kernel
+#	[[-1, 2, -3, 4]],
+#	#Recurrent Kernel
+#	[
+#		[-5, 6, -7, 8],
+#	],
+#	#Bias
+#	[-9, 10, -11, 12]
+#]
 
 layers = [{'weights': weights, 'return_sequences': True, 'layer_name': 'lstm_1'}, {'weights': weights, 'return_sequences': False, 'layer_name': 'lstm_2'}]
 
@@ -85,9 +104,9 @@ def write_lstm_weights_as_c(fp, weights, layer_name, return_sequences):
 	kernel = weights[0]
 	recurrent_kernel = weights[1]
 	bias = weights[2]
-	kernel_str = ' '.join([f'{weight:.20f},' for weight in kernel[0]])
-	recurrent_kernel_str = ' '.join([' '.join([f'{weight:.20f},' for weight in row]) for row in recurrent_kernel])
-	bias_str = ' '.join([f'{weight:.20f},' for weight in bias])
+	kernel_str = ' '.join([f'{weight:.17f},' for weight in kernel[0]])
+	recurrent_kernel_str = ' '.join([' '.join([f'{weight:.17f},' for weight in row]) for row in recurrent_kernel])
+	bias_str = ' '.join([f'{weight:.17f},' for weight in bias])
 	fp.write('float {}_kernel_weights[] = {}\n'.format(layer_name, '{' + kernel_str + '};' ))
 	fp.write('struct matrix_f {layer_name}_kernel = '.format(layer_name=layer_name)+'{'+'.x={}, .y={}, .data={layer_name}_kernel_weights'.format(len(kernel), len(kernel[0]), layer_name=layer_name)+'};\n')
 	fp.write('float {}_recurrent_kernel_weights[] = {}\n'.format(layer_name, '{' + recurrent_kernel_str + '};'))
